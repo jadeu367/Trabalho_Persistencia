@@ -1,0 +1,72 @@
+
+services:
+
+  # BANCO 1 - PostgreSQL
+  postgres:
+    image: postgres:16
+    container_name: marketplace_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: marketplace123
+      POSTGRES_DB: marketplace
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # BANCO 2 - MongoDB
+  mongodb:
+    image: mongo:7
+    container_name: marketplace_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # BANCO 3 - Redis
+  redis:
+    image: redis:7
+    container_name: marketplace_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # BANCO 4 - Cassandra
+  cassandra:
+    image: cassandra:5.0
+    container_name: marketplace_cassandra
+    profiles: ["outros"]
+    restart: unless-stopped
+    environment:
+      CASSANDRA_CLUSTER_NAME: MarketplaceCluster
+      MAX_HEAP_SIZE: 512M
+      HEAP_NEWSIZE: 100M
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+
+  # BANCO 5 - Neo4j
+  neo4j:
+    image: neo4j:5
+    container_name: marketplace_neo4j
+    profiles: ["outros"]
+    restart: unless-stopped
+    environment:
+      NEO4J_AUTH: neo4j/marketplace123
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+
+volumes:
+  postgres_data:
+  mongo_data:
+  redis_data:
+  cassandra_data:
+  neo4j_data:
