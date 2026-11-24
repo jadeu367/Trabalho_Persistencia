@@ -181,3 +181,18 @@ Foram realizados testes para verificar:
 A implementação utiliza diferentes tecnologias de persistência, aproveitando as características de cada banco de dados.
 
 O PostgreSQL garante a consistência das operações relacionais e transacionais, o MongoDB oferece flexibilidade na estrutura do catálogo e o Redis permite consultas rápidas dos produtos organizados por marca.
+
+## 10. Neo4j — R7 (Pessoa 3)
+
+Recomendações "quem comprou este produto também comprou" e "clientes com histórico parecido com o seu compraram isto", modeladas como grafo `(:Cliente)-[:COMPROU]->(:Produto)`. Instruções completas e resultados esperados em [`pessoa3/README.md`](pessoa3/README.md).
+
+```bash
+docker compose --profile outros up -d neo4j
+docker compose exec -T neo4j cypher-shell -u neo4j -p marketplace123 < pessoa3/neo4j/01_criacao_carga.cypher
+docker compose exec -T neo4j cypher-shell -u neo4j -p marketplace123 < pessoa3/neo4j/02_recomendacoes.cypher
+```
+
+## 11. Relatório técnico
+
+O relatório em ABNT está em `pessoa3/relatorio/relatorio.pdf` (fonte LaTeX em `pessoa3/relatorio/relatorio.tex`).
+

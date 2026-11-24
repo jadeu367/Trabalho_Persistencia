@@ -1,0 +1,777 @@
+% ============================================================
+%  MARKETPLACE — PERSISTÊNCIA POLIGLOTA  |  Trabalho Final (N3)
+%  Desenvolvimento de Software para Persistência — UniRV
+%  Formatação: mesma do TFC (Manual UniRV 2025, 2ª edição)
+%  Compilar: latexmk -pdf relatorio.tex
+% ============================================================
+\documentclass[12pt,a4paper,oneside]{article}
+
+% ------- Dados do trabalho  >>> CONFERIR OS CAMPOS ENTRE COLCHETES <<< -------
+\newcommand{\PessoaUm}{[NOME DA PESSOA 1]}
+\newcommand{\PessoaDois}{Matheus Araújo Silva}
+\newcommand{\PessoaTres}{Marques Vinícius Melo Martins}
+\newcommand{\Professor}{[NOME DO PROFESSOR]}
+\newcommand{\Titulo}{Marketplace: camada de persistência poliglota com PostgreSQL, MongoDB, Redis, Cassandra e Neo4j}
+\newcommand{\Repositorio}{https://github.com/jadeu367/Trabalho_Persistencia}
+\newcommand{\Video}{[LINK DO VÍDEO]}
+
+% ------- Pacotes -------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazilian]{babel}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{indentfirst}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{hyperref}
+\urlstyle{same}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{microtype}
+\usepackage{etoolbox}
+\usepackage{mathptmx} % Times New Roman
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset{
+  basicstyle=\small\ttfamily,
+  breaklines=true,
+  breakatwhitespace=false,
+  columns=flexible,
+  keepspaces=true,
+  frame=single,
+  framesep=4pt,
+  xleftmargin=6pt,
+  xrightmargin=6pt,
+  aboveskip=8pt,
+  belowskip=8pt,
+  showstringspaces=false,
+  literate=
+    {á}{{\'{a}}}1 {é}{{\'{e}}}1 {í}{{\'{i}}}1 {ó}{{\'{o}}}1 {ú}{{\'{u}}}1
+    {à}{{\`{a}}}1 {â}{{\^{a}}}1 {ê}{{\^{e}}}1 {ô}{{\^{o}}}1
+    {ã}{{\~{a}}}1 {õ}{{\~{o}}}1
+    {ç}{{\c{c}}}1
+    {Á}{{\'{A}}}1 {É}{{\'{E}}}1 {Í}{{\'{I}}}1 {Ó}{{\'{O}}}1 {Ú}{{\'{U}}}1
+    {Â}{{\^{A}}}1 {Ê}{{\^{E}}}1 {Ô}{{\^{O}}}1
+    {Ã}{{\~{A}}}1 {Õ}{{\~{O}}}1 {Ç}{{\c{C}}}1
+    {—}{{---}}1 {→}{{->}}1 {…}{{...}}1 {≥}{{>=}}1,
+}
+
+% ------- Geometria (ABNT / UniRV: 3cm sup/esq, 2cm inf/dir) -------
+\geometry{top=3cm, bottom=2cm, left=3cm, right=2cm}
+
+% ------- Espaçamento 1,5 (ABNT) -------
+\setstretch{1.5}
+
+% ------- Recuo 1,25cm (ABNT) -------
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0pt}
+
+% ------- Headheight -------
+\setlength{\headheight}{14.5pt}
+
+% ------- Cabeçalho/rodapé -------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{semnum}{\fancyhf{}\renewcommand{\headrulewidth}{0pt}}
+\fancypagestyle{plain}{\fancyhf{}\renewcommand{\headrulewidth}{0pt}}
+
+% ------- Títulos de seção -------
+\titleformat{\section}[block]{\normalfont\normalsize\bfseries}{\thesection\quad}{0pt}{\MakeUppercase}
+\titlespacing{\section}{0pt}{\baselineskip}{12pt}
+\titleformat{\subsection}[block]{\normalfont\normalsize}{\thesubsection\quad}{0pt}{\MakeUppercase}
+\titlespacing{\subsection}{0pt}{12pt}{6pt}
+\titleformat{\subsubsection}[block]{\normalfont\normalsize\bfseries}{\thesubsubsection\quad}{0pt}{}
+\titlespacing{\subsubsection}{0pt}{12pt}{6pt}
+
+% ------- Sumário -------
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsecpagefont}{\bfseries}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{2pt}
+\setlength{\cftsecindent}{0pt}
+\setlength{\cftsubsecindent}{20pt}
+\setlength{\cftsubsubsecindent}{40pt}
+\renewcommand{\cftfigpresnum}{FIGURA~}
+\renewcommand{\cftfigaftersnum}{ -- }
+\setlength{\cftfignumwidth}{2.85cm}
+\renewcommand{\cfttabpresnum}{QUADRO~}
+\renewcommand{\cfttabaftersnum}{ -- }
+\setlength{\cfttabnumwidth}{2.95cm}
+
+\makeatletter
+\let\tys@oldl@subsection\l@subsection
+\renewcommand*{\l@subsection}[2]{\tys@oldl@subsection{\MakeUppercase{#1}}{#2}}
+\makeatother
+
+% ------- Legendas ABNT/UniRV -------
+% Figuras: "FIGURA X -- Título" (fonte 10, acima da imagem)
+\DeclareCaptionLabelSeparator{figsep}{~--~}
+\DeclareCaptionLabelSeparator{quadrosep}{~--~}
+\captionsetup[figure]{
+  font=footnotesize, labelfont=bf, labelsep=figsep,
+  justification=justified, singlelinecheck=false,
+  position=above, skip=6pt, format=plain
+}
+\renewcommand{\figurename}{FIGURA}
+
+% Quadros/Tabelas: "QUADRO X -- Título" (fonte 10, acima)
+\captionsetup[table]{
+  font=footnotesize, labelfont=bf, labelsep=quadrosep,
+  justification=justified, singlelinecheck=false,
+  position=above, skip=6pt, format=plain
+}
+\renewcommand{\tablename}{QUADRO}
+
+% Códigos: "CÓDIGO X -- Título" (mesmo padrão das figuras)
+\captionsetup[lstlisting]{
+  font=footnotesize, labelfont=bf, labelsep=figsep,
+  justification=justified, singlelinecheck=false, skip=6pt, format=plain
+}
+\renewcommand{\lstlistingname}{CÓDIGO}
+% babel redefine os nomes no \begin{document}; força FIGURA/QUADRO
+\addto\captionsbrazilian{\renewcommand{\tablename}{QUADRO}\renewcommand{\figurename}{FIGURA}}
+
+% ------- Hyperlinks -------
+\hypersetup{colorlinks=true, linkcolor=black, urlcolor=black, citecolor=black}
+
+% ------- Sistema de citação autor-data (ABNT/UniRV), igual ao do TFC -------
+%   \cite{chave}   -> (Autor, Ano)
+%   \citet{chave}  -> Autor (Ano)
+\makeatletter
+\renewcommand\@biblabel[1]{}
+
+\@namedef{cite@sadalage2013}{Sadalage; Fowler, 2013}
+\@namedef{citet@sadalage2013}{Sadalage e Fowler (2013)}
+\@namedef{cite@kleppmann2017}{Kleppmann, 2017}
+\@namedef{citet@kleppmann2017}{Kleppmann (2017)}
+\@namedef{cite@elmasri2018}{Elmasri; Navathe, 2018}
+\@namedef{citet@elmasri2018}{Elmasri e Navathe (2018)}
+\@namedef{cite@robinson2015}{Robinson; Webber; Eifrem, 2015}
+\@namedef{citet@robinson2015}{Robinson, Webber e Eifrem (2015)}
+\@namedef{cite@carpenter2020}{Carpenter; Hewitt, 2020}
+\@namedef{citet@carpenter2020}{Carpenter e Hewitt (2020)}
+\@namedef{cite@carlson2013}{Carlson, 2013}
+\@namedef{citet@carlson2013}{Carlson (2013)}
+\@namedef{cite@bradshaw2019}{Bradshaw; Brazil; Chodorow, 2019}
+\@namedef{citet@bradshaw2019}{Bradshaw, Brazil e Chodorow (2019)}
+\@namedef{cite@brewer2000}{Brewer, 2000}
+\@namedef{citet@brewer2000}{Brewer (2000)}
+\@namedef{cite@postgresdoc}{PostgreSQL Global Development Group, 2026}
+\@namedef{citet@postgresdoc}{PostgreSQL Global Development Group (2026)}
+\@namedef{cite@mongodoc}{MongoDB, 2026}
+\@namedef{citet@mongodoc}{MongoDB (2026)}
+\@namedef{cite@redisdoc}{Redis, 2026}
+\@namedef{citet@redisdoc}{Redis (2026)}
+\@namedef{cite@cassandradoc}{Apache Software Foundation, 2026}
+\@namedef{citet@cassandradoc}{Apache Software Foundation (2026)}
+\@namedef{cite@neo4jdoc}{Neo4j, 2026}
+\@namedef{citet@neo4jdoc}{Neo4j (2026)}
+\@namedef{cite@dockerdoc}{Docker, 2026}
+\@namedef{citet@dockerdoc}{Docker (2026)}
+
+\newcommand{\tys@getpar}[1]{%
+  \@ifundefined{cite@#1}{\textbf{??#1??}}{\@nameuse{cite@#1}}%
+}
+\newcommand{\tys@gettx}[1]{%
+  \@ifundefined{citet@#1}{\textbf{??#1??}}{\@nameuse{citet@#1}}%
+}
+\newif\iftysfirst
+\newcommand{\tys@listpar}[1]{%
+  \tysfirsttrue
+  \@for\tys@key:=#1\do{%
+    \iftysfirst\tysfirstfalse\else; \fi
+    \expandafter\tys@getpar\expandafter{\tys@key}%
+  }%
+}
+\renewcommand{\cite}[1]{(\tys@listpar{#1})}
+\newcommand{\citep}[1]{(\tys@listpar{#1})}
+\newcommand{\citet}[1]{\tys@gettx{#1}}
+\makeatother
+
+% ------- Comando fonte (ABNT: fonte 10, espaçamento simples, com ponto) -------
+% Sempre FORA do float (após \end{figure} ou \end{table})
+\newcommand{\fonte}[1]{%
+  \begin{spacing}{1.0}\noindent{\footnotesize Fonte: #1.}\end{spacing}%
+  \vspace{4pt}%
+}
+
+
+% ============================================================
+\begin{document}
+% ============================================================
+
+\pagestyle{semnum}
+
+% === CAPA ===
+\thispagestyle{semnum}
+\begin{center}
+\begin{spacing}{1.0}
+{\bfseries\MakeUppercase{Universidade de Rio Verde (UniRV)}}\\[4pt]
+{\bfseries\MakeUppercase{Engenharia de Software}}
+\end{spacing}
+\vfill
+\begin{spacing}{1.0}
+{\bfseries\MakeUppercase{\PessoaUm}}\\[4pt]
+{\bfseries\MakeUppercase{\PessoaDois}}\\[4pt]
+{\bfseries\MakeUppercase{\PessoaTres}}
+\end{spacing}
+\vfill\vfill
+\begin{spacing}{1.0}
+{\bfseries\MakeUppercase{\Titulo}}
+\end{spacing}
+\vfill\vfill\vfill
+\begin{spacing}{1.0}
+{\bfseries\MakeUppercase{Rio Verde, GO}}\\
+{\bfseries\MakeUppercase{2026}}
+\end{spacing}
+\end{center}
+
+% === FOLHA DE ROSTO ===
+\newpage\thispagestyle{semnum}
+\begin{center}
+\begin{spacing}{1.0}
+{\bfseries\MakeUppercase{\PessoaUm}}\\[4pt]
+{\bfseries\MakeUppercase{\PessoaDois}}\\[4pt]
+{\bfseries\MakeUppercase{\PessoaTres}}
+\end{spacing}
+\end{center}
+\vfill
+\begin{center}
+\begin{spacing}{1.0}{\bfseries\MakeUppercase{\Titulo}}\end{spacing}
+\end{center}
+\vspace{2\baselineskip}
+\hspace{8cm}\begin{minipage}{\dimexpr\textwidth-8cm\relax}
+\begin{spacing}{1.0}\small
+Relatório técnico apresentado à disciplina de Desenvolvimento de Software para Persistência do Curso de Engenharia de Software da Universidade de Rio Verde (UniRV), como requisito de avaliação do Trabalho Final (N3), Grupo 1 -- Marketplace.
+\vspace{12pt}
+
+Professor: \Professor
+\end{spacing}
+\end{minipage}
+\vfill\vfill
+\begin{center}\begin{spacing}{1.0}{\bfseries\MakeUppercase{Rio Verde, GO}}\\[4pt]{\bfseries\MakeUppercase{2026}}\end{spacing}\end{center}
+
+% === RESUMO (espaçamento simples, sem recuo) ===
+\newpage\thispagestyle{semnum}
+\begin{center}{\bfseries\MakeUppercase{Resumo}}\end{center}
+\vspace{\baselineskip}
+\begin{spacing}{1.0}
+\noindent Este relatório descreve o projeto e a implementação da camada de persistência de um \textit{marketplace} com cinco tecnologias de banco de dados: PostgreSQL, MongoDB, Redis, Apache Cassandra e Neo4j. Oito requisitos de negócio, escritos sem indicação de tecnologia, foram analisados quanto ao padrão de acesso, à necessidade de consistência, ao volume e à forma dos dados, e cada um foi atribuído ao banco cujo modelo melhor o atende. O registro de pedidos com baixa de estoque usa transações ACID no PostgreSQL. O catálogo com atributos variáveis por categoria usa documentos no MongoDB. Sessão, carrinho, ranking de visualizações e listagem por marca usam estruturas em memória do Redis, com expiração nativa e conjuntos ordenados. O registro massivo de eventos de navegação usa uma tabela da Cassandra modelada a partir da consulta. As recomendações do tipo ``quem comprou também comprou'' usam percursos em grafo no Neo4j. O ambiente sobe com um único comando via Docker Compose, e cada banco tem scripts de criação, carga e demonstração. Os testes confirmaram a atomicidade do pedido, a flexibilidade do catálogo, a expiração automática da sessão, a ordenação do histórico e as recomendações esperadas.
+
+\vspace{\baselineskip}
+\noindent\textbf{Palavras-chave:} persistência poliglota; NoSQL; bancos de dados; modelagem de dados; \textit{marketplace}.
+\end{spacing}
+
+% === ABSTRACT ===
+\newpage\thispagestyle{semnum}
+\begin{center}{\bfseries\MakeUppercase{Abstract}}\end{center}
+\vspace{\baselineskip}
+\begin{spacing}{1.0}
+\noindent This report presents the design and implementation of the persistence layer of a marketplace using five database technologies: PostgreSQL, MongoDB, Redis, Apache Cassandra and Neo4j. Eight business requirements, written without naming any technology, were analysed according to access pattern, consistency needs, volume and data shape, and each one was assigned to the database whose model fits it best. Order registration with stock decrement uses ACID transactions in PostgreSQL. The catalog, whose attributes vary by category, uses documents in MongoDB. Session, cart, view ranking and listing by brand use Redis in-memory structures with native expiration and sorted sets. The high-volume navigation event log uses a Cassandra table modelled from its query. ``Customers who bought this also bought'' recommendations use graph traversals in Neo4j. The environment starts with a single Docker Compose command, and each database has its own creation, load and demonstration scripts.
+
+\vspace{\baselineskip}
+\noindent\textbf{Keywords:} polyglot persistence; NoSQL; databases; data modeling; marketplace.
+\end{spacing}
+
+% === LISTAS ===
+\newpage\thispagestyle{semnum}
+\begin{center}{\bfseries\MakeUppercase{Lista de Figuras}}\end{center}
+\vspace{\baselineskip}
+\renewcommand{\listfigurename}{}
+\vspace{-2\baselineskip}
+\listoffigures
+
+\vspace{2\baselineskip}
+\begin{center}{\bfseries\MakeUppercase{Lista de Quadros}}\end{center}
+\vspace{\baselineskip}
+\renewcommand{\listtablename}{}
+\vspace{-2\baselineskip}
+\listoftables
+
+\newpage\thispagestyle{semnum}
+\begin{center}{\bfseries\MakeUppercase{Lista de Siglas}}\end{center}
+\vspace{\baselineskip}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.0}
+\noindent\begin{tabularx}{\textwidth}{@{}X@{}}
+ACID~--~Atomicidade, Consistência, Isolamento e Durabilidade\\
+API~--~\textit{Application Programming Interface} (Interface de Programação de Aplicações)\\
+CAP~--~\textit{Consistency, Availability, Partition tolerance} (Consistência, Disponibilidade, Tolerância a partições)\\
+CQL~--~\textit{Cassandra Query Language}\\
+JSON~--~\textit{JavaScript Object Notation}\\
+NoSQL~--~\textit{Not only SQL}\\
+SQL~--~\textit{Structured Query Language} (Linguagem de Consulta Estruturada)\\
+TTL~--~\textit{Time To Live} (Tempo de Vida)\\
+\end{tabularx}
+\setlength{\tabcolsep}{6pt}
+
+% === SUMÁRIO ===
+\newpage\thispagestyle{semnum}
+\begin{center}{\bfseries\MakeUppercase{Sumário}}\end{center}
+\vspace{\baselineskip}
+\renewcommand{\contentsname}{}
+\vspace{-2\baselineskip}
+\tableofcontents
+
+% ============================================================
+%  TEXTO — numeração arábica
+% ============================================================
+\newpage
+% A contagem começa na folha de rosto (página 1); a capa não conta.
+\addtocounter{page}{-1}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+\section{INTRODUÇÃO}
+
+Aplicações modernas raramente têm um único padrão de acesso a dados. Um \textit{marketplace}, por exemplo, precisa registrar pedidos com a garantia de que estoque e pagamento fiquem consistentes. Ele também mantém um catálogo cujos produtos têm atributos muito diferentes entre si, guarda dados efêmeros de sessão e carrinho, grava um fluxo contínuo de eventos de navegação e responde a perguntas sobre os relacionamentos entre clientes e produtos. Cada uma dessas necessidades favorece um modelo de dados diferente, e usar um único banco para todas obriga a aceitar compromissos ruins em pelo menos algumas delas.
+
+A abordagem conhecida como persistência poliglota propõe usar, em um mesmo sistema, tecnologias de armazenamento diferentes, cada uma aplicada ao problema para o qual foi projetada \cite{sadalage2013}. O custo dessa flexibilidade é operacional: há mais tecnologias para administrar e é preciso manter os dados coerentes entre elas.
+
+O objetivo deste trabalho é projetar e implementar a camada de persistência de um \textit{marketplace} usando obrigatoriamente cinco bancos de dados -- PostgreSQL, MongoDB, Redis, Apache Cassandra e Neo4j --, escolhendo qual tecnologia atende cada requisito, justificando a escolha, modelando os dados em cada banco e demonstrando o funcionamento com scripts executáveis.
+
+Conforme o enunciado, o escopo é exclusivamente a camada de dados. Não fazem parte dele interface de usuário, API, autenticação real ou aplicação executável. A entrega é composta por um arquivo \texttt{docker-compose.yml}, que sobe os cinco bancos, e por scripts de criação, carga e demonstração para cada banco, que simulam as operações que uma aplicação faria.
+
+O trabalho foi dividido entre os três integrantes. \PessoaUm{} ficou com o PostgreSQL (R1), o MongoDB (R2) e a integração do catálogo com o Redis, que alimenta o R8. \PessoaDois{} ficou com o Redis (R3, R4 e R5) e a Cassandra (R6). \PessoaTres{} ficou com o Neo4j (R7) e com a consolidação deste relatório. O repositório segue essa divisão, com uma pasta por integrante.
+
+Este documento está organizado em seis capítulos. O Capítulo 2 resume os conceitos que embasam as decisões. O Capítulo 3 apresenta os requisitos e a tabela de decisão de tecnologia. O Capítulo 4 detalha a modelagem em cada banco. O Capítulo 5 descreve o ambiente e apresenta os resultados das demonstrações. O Capítulo 6 traz as considerações finais. As instruções de execução estão no Apêndice A.
+
+\section{FUNDAMENTAÇÃO TEÓRICA}
+
+\subsection{Bancos relacionais e transações ACID}
+
+O modelo relacional organiza os dados em tabelas com esquema definido e relacionamentos expressos por chaves estrangeiras \cite{elmasri2018}. Seu principal diferencial para o problema estudado é o suporte a transações com as propriedades ACID. A atomicidade garante que um conjunto de operações seja aplicado por inteiro ou não seja aplicado. A consistência preserva as restrições declaradas. O isolamento impede que transações concorrentes vejam estados intermediários umas das outras, e a durabilidade mantém o que foi confirmado mesmo após falhas \cite{kleppmann2017}.
+
+\subsection{Bancos NoSQL e o compromisso entre consistência e disponibilidade}
+
+O termo NoSQL agrupa bancos que abrem mão de parte das garantias ou da generalidade do modelo relacional em troca de escalabilidade horizontal, flexibilidade de esquema ou desempenho em padrões de acesso específicos \cite{sadalage2013}. Em sistemas distribuídos, o teorema CAP afirma que, diante de uma partição de rede, um sistema precisa escolher entre consistência e disponibilidade \cite{brewer2000}. Bancos como a Cassandra priorizam disponibilidade e tolerância a partições, com consistência ajustável por operação \cite{carpenter2020}.
+
+Os quatro modelos NoSQL usados neste trabalho são:
+
+\begin{itemize}
+\item \textbf{Documentos (MongoDB):} registros autocontidos em formato semelhante a JSON, sem exigência de que documentos da mesma coleção tenham os mesmos campos \cite{bradshaw2019}.
+\item \textbf{Chave-valor em memória (Redis):} estruturas de dados (\textit{strings}, \textit{hashes}, conjuntos e conjuntos ordenados) mantidas em memória, com operações atômicas e expiração nativa de chaves \cite{carlson2013}.
+\item \textbf{Famílias de colunas (Cassandra):} tabelas particionadas por uma chave de partição e ordenadas por chaves de agrupamento (\textit{clustering keys}), otimizadas para escrita distribuída \cite{carpenter2020}.
+\item \textbf{Grafos (Neo4j):} nós e relacionamentos como elementos de primeira classe, com propriedades em ambos e consultas expressas como padrões de caminho \cite{robinson2015}.
+\end{itemize}
+
+\subsection{Persistência poliglota}
+
+Para \citet{sadalage2013}, a persistência poliglota é a escolha deliberada de tecnologias diferentes para necessidades diferentes dentro de uma mesma solução. O ponto central é que a escolha parte do padrão de acesso, ou seja, de como o dado é escrito e lido, e não de uma preferência por tecnologia. Essa foi a regra adotada na análise de cada requisito do Capítulo 3.
+
+\section{REQUISITOS E DECISÕES DE ARQUITETURA}
+
+O Grupo 1 recebeu o tema \textit{Marketplace}, com oito requisitos escritos em linguagem de negócio. Para cada um, foram avaliados quatro critérios: a exigência de consistência, o padrão de leitura e escrita, o volume esperado e a forma dos dados. O Quadro~\ref{tab:decisao} resume o resultado, e as subseções seguintes detalham as justificativas e as alternativas consideradas.
+
+\begin{table}[H]
+\caption{Tabela de decisão: requisito, banco e estrutura escolhidos}
+\label{tab:decisao}
+\begin{spacing}{1.0}\footnotesize\renewcommand{\arraystretch}{1.3}
+\noindent\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|l|>{\raggedright\arraybackslash}X|}\hline
+\textbf{Req.} & \textbf{Necessidade} & \textbf{Banco} & \textbf{Estrutura} \\\hline
+R1 & Pedido, itens, pagamento e baixa de estoque, tudo ou nada & PostgreSQL & Tabelas normalizadas e transação \texttt{BEGIN}/\texttt{COMMIT} \\\hline
+R2 & Catálogo com atributos diferentes por categoria & MongoDB & Coleção \texttt{produtos} com subdocumento \texttt{atributos} \\\hline
+R3 & Sessão que expira após 30 min de inatividade & Redis & \textit{String} \texttt{sessao:<usuario>} com \texttt{EX 1800} \\\hline
+R4 & Carrinho com alta frequência de alteração & Redis & \textit{Hash} \texttt{carrinho:<usuario>} \\\hline
+R5 & Visualizações e ranking sempre ordenado & Redis & Contador \texttt{visualizacoes:<produto>} e \textit{Sorted Set} \texttt{ranking:produtos} \\\hline
+R6 & Centenas de milhares de eventos por hora e histórico por usuário & Cassandra & Tabela \texttt{historico\_usuario} \\\hline
+R7 & ``Quem comprou também comprou'' e clientes com histórico parecido & Neo4j & \texttt{(:Cliente)-[:COMPROU]->(:Produto)} \\\hline
+R8 & Listar produtos de uma marca sem consultar o banco principal & Redis & \textit{Set} \texttt{marca:<id>:produtos} e \textit{Hash} \texttt{produto:<id>} \\\hline
+\end{tabularx}
+\end{spacing}
+\end{table}
+\fonte{Elaborado pelos autores (2026)}
+
+\subsection{R1 -- Registro de pedido com baixa de estoque}
+
+O requisito exige que pedido, itens, pagamento e baixa de estoque aconteçam por inteiro ou não aconteçam. Trata-se de uma transação que envolve várias entidades relacionadas, cada uma com restrições de integridade: o estoque não pode ficar negativo e todo item precisa estar vinculado a um pedido e a um produto existentes. O PostgreSQL oferece transações ACID, chaves estrangeiras e restrições \texttt{CHECK} \cite{postgresdoc}, o que o torna a escolha natural. O MongoDB também suporta transações com vários documentos, mas com custo e restrições maiores, e o problema é intrinsecamente relacional. As demais tecnologias não oferecem atomicidade entre várias entidades.
+
+\subsection{R2 -- Catálogo com atributos por categoria}
+
+Celular tem memória e tela, livro tem ISBN e número de páginas, camiseta tem tamanho e cor. No modelo relacional isso levaria a uma tabela com dezenas de colunas quase sempre nulas, a uma tabela por categoria ou ao padrão entidade-atributo-valor, que dificulta consultas e validação. No MongoDB, cada produto é um documento com os campos comuns (nome, preço, categoria e marca) e um subdocumento \texttt{atributos} próprio da categoria \cite{bradshaw2019}. Novas categorias não exigem alteração de esquema, e ainda assim é possível indexar e filtrar por atributos internos.
+
+\subsection{R3 -- Sessão com expiração automática}
+
+A sessão é um dado efêmero, lido a cada requisição, que deve desaparecer após 30 minutos sem atividade e sem rotina de limpeza. O Redis associa um tempo de vida (TTL) a qualquer chave e a remove sozinho quando o prazo vence \cite{redisdoc}. A sessão é gravada com \texttt{SET ... EX 1800}, ou seja, com validade de 1800 segundos. Para que a contagem parta da inatividade, a aplicação renova esse prazo a cada requisição do usuário (por exemplo, com \texttt{EXPIRE}), e a chave só expira depois de 30 minutos sem acesso. A leitura em memória também atende à frequência de acesso.
+
+\subsection{R4 -- Carrinho de compras}
+
+O carrinho muda a cada clique e é consultado com frequência. Um \textit{hash} por usuário, com o produto como campo e a quantidade como valor, permite adicionar (\texttt{HSET}), alterar a quantidade (\texttt{HINCRBY}) e remover (\texttt{HDEL}) um item sem reescrever o carrinho inteiro, com operações atômicas e em memória \cite{carlson2013}.
+
+\subsection{R5 -- Visualizações e ranking dos mais vistos}
+
+Cada visualização incrementa o contador do produto com \texttt{INCR}, uma operação atômica que não perde incrementos sob concorrência. O ranking usa um \textit{sorted set}, que mantém os membros ordenados pelo \textit{score}: com o produto como membro e as visualizações como \textit{score}, o \texttt{ZINCRBY} reposiciona o produto a cada nova visualização, e o \texttt{ZREVRANGE} devolve os mais vistos já ordenados, em tempo logarítmico \cite{redisdoc}.
+
+\subsection{R6 -- Eventos de navegação em alto volume}
+
+O requisito combina escrita massiva e contínua com uma consulta bem definida: o histórico completo de um usuário. A Cassandra é projetada para alta vazão de escrita distribuída entre nós, sem ponto único de falha \cite{carpenter2020}, e nela a tabela é modelada a partir da consulta. Com a chave de partição \texttt{usuario\_id}, todos os eventos de um usuário ficam na mesma partição. Com a chave de agrupamento \texttt{data\_evento DESC}, ficam gravados do mais recente para o mais antigo, e a consulta do histórico vira a leitura sequencial de uma partição. Um banco relacional sofreria com o volume de escrita e com o crescimento contínuo dos índices, e o Redis não é adequado para guardar um histórico completo e crescente.
+
+\subsection{R7 -- Recomendações}
+
+As duas perguntas do requisito, ``quem comprou este produto também comprou'' e ``clientes com histórico parecido com o seu compraram isto'', são percursos de relacionamentos: partem de um nó, seguem as compras até outros clientes e voltam a outros produtos. Em um banco de grafos, cada nó referencia diretamente seus vizinhos (\textit{index-free adjacency}), e o custo da consulta depende da vizinhança visitada, não do tamanho total da base \cite{robinson2015}. No PostgreSQL, a mesma consulta exigiria \textit{self-joins} encadeados na tabela de itens, que ficam mais complexos a cada salto.
+
+\subsection{R8 -- Listagem por marca sem consultar o banco principal}
+
+A tela de navegação rápida precisa listar os produtos de uma marca sem acessar o banco principal. A solução é um índice em memória no Redis, com um conjunto de identificadores de produtos por marca (\texttt{SADD}) e um \textit{hash} com os dados de cada produto (\texttt{HSET}), alimentado a partir do catálogo do MongoDB. A tela lê o conjunto da marca com \texttt{SMEMBERS} e os detalhes de cada produto com \texttt{HGETALL}, sem tocar no MongoDB. Esse requisito admite outras respostas, como uma visão materializada ou um índice secundário no próprio catálogo. O Redis foi escolhido por já estar presente na arquitetura e por atender ao requisito explícito de não consultar o banco principal.
+
+\section{MODELAGEM}
+
+O Quadro~\ref{tab:volume} mostra o volume de dados carregado em cada banco pelos scripts de carga. Os produtos do catálogo (\texttt{CEL001}, \texttt{LIV001} e \texttt{CAM001}) são os mesmos no PostgreSQL, no MongoDB, no índice por marca do Redis e no Neo4j.
+
+\begin{table}[H]
+\caption{Volume de dados carregado por banco}
+\label{tab:volume}
+\begin{spacing}{1.0}\footnotesize\renewcommand{\arraystretch}{1.3}
+\noindent\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}\hline
+\textbf{Banco} & \textbf{Carga} \\\hline
+PostgreSQL & 2 clientes, 3 produtos com estoque, 1 pedido com 2 itens e 1 pagamento \\\hline
+MongoDB & 3 produtos em 3 categorias (celular, livro e camiseta) e 3 marcas \\\hline
+Redis & 1 sessão, 1 carrinho, contadores e ranking de 2 produtos, índice de 3 marcas e 3 produtos \\\hline
+Cassandra & 3 eventos de navegação de 2 usuários \\\hline
+Neo4j & 10 clientes, 11 produtos, 4 categorias e 28 relações de compra \\\hline
+\end{tabularx}
+\end{spacing}
+\end{table}
+\fonte{Elaborado pelos autores (2026)}
+
+\subsection{PostgreSQL}
+
+O esquema tem cinco tabelas: \texttt{clientes}, \texttt{produtos\_estoque}, \texttt{pedidos}, \texttt{itens\_pedido} e \texttt{pagamentos}, relacionadas como mostra a Figura~\ref{fig:er}. O estoque tem a restrição \texttt{CHECK (quantidade\_estoque >= 0)}, os itens exigem quantidade positiva e preço não negativo, e há índices nas chaves estrangeiras mais consultadas.
+
+\begin{figure}[H]
+\caption{Relacionamentos do esquema relacional}
+\label{fig:er}
+\begin{lstlisting}[basicstyle=\scriptsize\ttfamily\setstretch{1.0},frame=none,columns=fixed]
+clientes 1 ---< N pedidos 1 ---< N itens_pedido N >--- 1 produtos_estoque
+                   |
+                   1
+                   |
+                   N pagamentos
+\end{lstlisting}
+\end{figure}
+\fonte{Elaborado pelos autores (2026)}
+
+O registro do pedido (Código~\ref{lst:pg}) roda entre \texttt{BEGIN} e \texttt{COMMIT}, dentro de um bloco PL/pgSQL. A baixa de estoque é condicional (\texttt{WHERE quantidade\_estoque >= 2}) e o número de linhas afetadas é conferido com \texttt{GET DIAGNOSTICS}. Se nenhuma linha foi alterada, o bloco levanta uma exceção e toda a transação é desfeita: pedido, itens e baixas já feitas. O \texttt{UPDATE} também trava a linha do produto até o fim da transação, o que impede que dois pedidos simultâneos vendam a mesma unidade.
+
+\noindent\begin{minipage}{\linewidth}
+\begin{spacing}{1.0}
+\begin{lstlisting}[language=SQL, caption={Trecho da transação de registro do pedido (R1)}, label={lst:pg}]
+BEGIN;
+DO $$
+DECLARE v_pedido INTEGER; v_linhas INTEGER;
+BEGIN
+    INSERT INTO pedidos (id_cliente, status) VALUES (1, 'APROVADO')
+    RETURNING id_pedido INTO v_pedido;
+    INSERT INTO itens_pedido (id_pedido, id_produto, quantidade, preco_unitario)
+    VALUES (v_pedido, 'CEL001', 2, 1500.00), (v_pedido, 'LIV001', 1, 80.00);
+
+    UPDATE produtos_estoque SET quantidade_estoque = quantidade_estoque - 2
+     WHERE id_produto = 'CEL001' AND quantidade_estoque >= 2;
+    GET DIAGNOSTICS v_linhas = ROW_COUNT;
+    IF v_linhas <> 1 THEN
+        RAISE EXCEPTION 'Estoque insuficiente para CEL001';
+    END IF;
+    -- (mesma baixa condicional para LIV001)
+    INSERT INTO pagamentos (id_pedido, valor, forma_pagamento, status)
+    VALUES (v_pedido, 3080.00, 'CARTAO', 'APROVADO');
+    UPDATE pedidos SET valor_total = 3080.00 WHERE id_pedido = v_pedido;
+END $$;
+COMMIT;
+\end{lstlisting}
+\end{spacing}
+\end{minipage}
+\fonte{Elaborado pelos autores (2026)}
+
+O script \texttt{04\_testes.sql} repete o mesmo fluxo pedindo 100 unidades do celular, mais do que o estoque disponível, para demonstrar que a transação é desfeita por inteiro.
+
+\subsection{MongoDB}
+
+O catálogo é a coleção \texttt{produtos}. Os campos comuns ficam na raiz do documento, e os específicos da categoria ficam no subdocumento \texttt{atributos}, como mostra o Código~\ref{lst:mongo}. A marca é embutida no documento (identificador e nome), porque é sempre exibida junto com o produto, e há índices em \texttt{categoria} e em \texttt{marca.id}, os campos usados nas consultas. O script de carga limpa a coleção antes de inserir, para que possa ser executado várias vezes.
+
+\noindent\begin{minipage}{\linewidth}
+\begin{spacing}{1.0}
+\begin{lstlisting}[caption={Dois produtos da mesma coleção com atributos diferentes}, label={lst:mongo}]
+{ _id: "CEL001", nome: "Smartphone Galaxy", categoria: "Celular",
+  preco: 1500.00, marca: { id: "MAR001", nome: "Samsung" },
+  atributos: { memoria_ram: "8GB", armazenamento: "256GB",
+               tela: "6.5 polegadas" } }
+
+{ _id: "LIV001", nome: "Engenharia de Software", categoria: "Livro",
+  preco: 80.00, marca: { id: "MAR002", nome: "Editora Exemplo" },
+  atributos: { isbn: "9781234567890", paginas: 350,
+               autor: "Autor Exemplo" } }
+\end{lstlisting}
+\end{spacing}
+\end{minipage}
+\fonte{Elaborado pelos autores (2026)}
+
+\subsection{Redis}
+
+O Quadro~\ref{tab:redis} resume as chaves usadas no Redis, e o Código~\ref{lst:redis} mostra as operações principais. O padrão de nomes \texttt{entidade:id} organiza o espaço de chaves e deixa explícito o que cada chave guarda. Os comandos do R8 são gerados por um script \texttt{mongosh} que percorre o catálogo no MongoDB e imprime um \texttt{SADD} e um \texttt{HSET} por produto; essa saída é enviada diretamente ao \texttt{redis-cli}.
+
+\begin{table}[H]
+\caption{Chaves e estruturas do Redis}
+\label{tab:redis}
+\begin{spacing}{1.0}\footnotesize\renewcommand{\arraystretch}{1.3}
+\noindent\begin{tabularx}{\textwidth}{|l|l|l|>{\raggedright\arraybackslash}X|}\hline
+\textbf{Req.} & \textbf{Chave} & \textbf{Estrutura} & \textbf{Conteúdo} \\\hline
+R3 & \texttt{sessao:<usuario>} & \textit{String} & dados da sessão, com TTL de 1800 s \\\hline
+R4 & \texttt{carrinho:<usuario>} & \textit{Hash} & produto e quantidade \\\hline
+R5 & \texttt{visualizacoes:<produto>} & \textit{String} & contador de visualizações \\\hline
+R5 & \texttt{ranking:produtos} & \textit{Sorted Set} & produto com \textit{score} igual às visualizações \\\hline
+R8 & \texttt{marca:<id>:produtos} & \textit{Set} & identificadores dos produtos da marca \\\hline
+R8 & \texttt{produto:<id>} & \textit{Hash} & nome, preço, marca e categoria \\\hline
+\end{tabularx}
+\end{spacing}
+\end{table}
+\fonte{Elaborado pelos autores (2026)}
+
+\noindent\begin{minipage}{\linewidth}
+\begin{spacing}{1.0}
+\begin{lstlisting}[caption={Operações principais no Redis}, label={lst:redis}]
+# R3: sessão com expiração de 30 minutos
+SET sessao:USR001 "usuario=USR001" EX 1800
+TTL sessao:USR001
+# R4: carrinho alterado item a item
+HSET carrinho:USR001 PROD001 2 PROD002 1
+HINCRBY carrinho:USR001 PROD001 1
+HDEL carrinho:USR001 PROD002
+# R5: contador e ranking
+INCR visualizacoes:PROD001
+ZINCRBY ranking:produtos 1 PROD001
+ZREVRANGE ranking:produtos 0 -1 WITHSCORES
+# R8: índice por marca (gerado a partir do MongoDB)
+SADD marca:MAR001:produtos CEL001
+HSET produto:CEL001 nome "Smartphone Galaxy" preco 1500 marca "Samsung"
+SMEMBERS marca:MAR001:produtos
+\end{lstlisting}
+\end{spacing}
+\end{minipage}
+\fonte{Elaborado pelos autores (2026)}
+
+\subsection{Cassandra}
+
+Na Cassandra, a modelagem parte da consulta. A tabela \texttt{historico\_usuario} (Código~\ref{lst:cql}) tem \texttt{usuario\_id} como chave de partição e \texttt{data\_evento} em ordem decrescente como chave de agrupamento. Assim, o histórico de um usuário é lido de uma única partição, já do evento mais recente para o mais antigo. A gravação é um \texttt{INSERT} simples, sem leitura prévia, que é o padrão mais eficiente de escrita na Cassandra \cite{carpenter2020}.
+
+\noindent\begin{minipage}{\linewidth}
+\begin{spacing}{1.0}
+\begin{lstlisting}[language=SQL, caption={Tabela de histórico de navegação}, label={lst:cql}]
+CREATE TABLE IF NOT EXISTS historico_usuario (
+    usuario_id   text,
+    data_evento  timestamp,
+    tipo_evento  text,
+    produto_id   text,
+    detalhes     text,
+    PRIMARY KEY (usuario_id, data_evento)
+) WITH CLUSTERING ORDER BY (data_evento DESC);
+\end{lstlisting}
+\end{spacing}
+\end{minipage}
+\fonte{Elaborado pelos autores (2026)}
+
+O volume do requisito se refere ao total de eventos do sistema. Por usuário, o número de eventos é ordens de grandeza menor, e por isso uma partição por usuário mantém tamanho administrável. Para usuários com histórico muito longo, a evolução natural seria uma partição composta, como \texttt{(usuario\_id, mes)}, que limita o tamanho de cada partição em troca de consultar várias partições para obter o histórico completo.
+
+\subsection{Neo4j}
+
+O grafo tem três rótulos de nó (\texttt{Cliente}, \texttt{Produto} e \texttt{Categoria}) e dois tipos de relacionamento: \texttt{COMPROU}, com data e quantidade, e \texttt{PERTENCE\_A}. A relação \texttt{COMPROU} representa os itens de pedidos já registrados no PostgreSQL. Os identificadores seguem os demais bancos (produtos \texttt{CEL001}, \texttt{LIV001} e \texttt{CAM001}; clientes \texttt{USR001} e \texttt{USR002}, João Silva e Maria Oliveira), e a carga acrescenta outros produtos e clientes para que as recomendações tenham volume suficiente para fazer sentido. Restrições de unicidade sobre os identificadores evitam nós duplicados e criam os índices usados para localizar o nó de partida de cada consulta.
+
+O Código~\ref{lst:cypher} mostra as duas consultas do R7. A primeira parte de um produto, chega aos clientes que o compraram e conta os outros produtos que esses clientes compraram. A segunda mede a semelhança entre clientes pelo número de produtos em comum, considera parecidos os que têm dois ou mais e recomenda o que eles compraram e o cliente ainda não comprou. A pontuação soma os produtos em comum de cada cliente parecido, de modo que recomendações vindas de clientes mais semelhantes pesam mais.
+
+\noindent\begin{minipage}{\linewidth}
+\begin{spacing}{1.0}
+\begin{lstlisting}[caption={Consultas de recomendação do R7}, label={lst:cypher}]
+// Quem comprou este produto também comprou
+MATCH (p:Produto {id: 'CEL001'})<-[:COMPROU]-(c:Cliente)-[:COMPROU]->(outro:Produto)
+WHERE outro <> p
+RETURN outro.nome AS nome, count(DISTINCT c) AS clientes
+ORDER BY clientes DESC LIMIT 5;
+
+// Clientes com histórico parecido com o seu compraram isto
+MATCH (eu:Cliente {id: 'USR001'})-[:COMPROU]->(p:Produto)<-[:COMPROU]-(parecido:Cliente)
+WITH eu, parecido, count(DISTINCT p) AS em_comum
+WHERE em_comum >= 2
+MATCH (parecido)-[:COMPROU]->(rec:Produto)
+WHERE NOT EXISTS { (eu)-[:COMPROU]->(rec) }
+RETURN rec.nome AS nome, count(DISTINCT parecido) AS clientes_parecidos,
+       sum(em_comum) AS pontuacao
+ORDER BY pontuacao DESC LIMIT 5;
+\end{lstlisting}
+\end{spacing}
+\end{minipage}
+\fonte{Elaborado pelos autores (2026)}
+
+\section{AMBIENTE E RESULTADOS}
+
+\subsection{Docker Compose}
+
+O arquivo \texttt{docker-compose.yml} define os cinco serviços, com as imagens oficiais \texttt{postgres:16}, \texttt{mongo:7}, \texttt{redis:7}, \texttt{cassandra:5.0} e \texttt{neo4j:5}, cada um com volume próprio de dados \cite{dockerdoc}. PostgreSQL, MongoDB e Redis sobem com \texttt{docker compose up -d}. Cassandra e Neo4j, mais pesados, ficam no perfil \texttt{outros}, de modo que o comando \texttt{docker compose --profile outros up -d} sobe os cinco bancos de uma vez.
+
+Os scripts são executados pelo cliente nativo de cada banco (\texttt{psql}, \texttt{mongosh}, \texttt{redis-cli}, \texttt{cqlsh} e \texttt{cypher-shell}) com \texttt{docker compose exec}, recebendo o arquivo pelo redirecionamento de entrada (\texttt{<}). Os comandos de cada banco estão no \texttt{README.md} da raiz e nos arquivos \texttt{README.md} das pastas dos integrantes.
+
+\subsection{Organização do repositório}
+
+O repositório (\url{\Repositorio}) é organizado por integrante. A pasta \texttt{pessoa1/} contém os scripts do PostgreSQL (criação das tabelas, dados, registro do pedido e teste de atomicidade), do MongoDB (catálogo e consultas) e da integração do catálogo com o Redis. A pasta \texttt{pessoa2/} contém os scripts do Redis (sessões, carrinho e visualizações) e da Cassandra. A pasta \texttt{pessoa3/} contém os scripts do Neo4j e este relatório.
+
+\subsection{Resultados das demonstrações}
+
+Os scripts foram executados em Windows 11 com Docker Desktop 28.5 e Docker Compose 2.40. O Quadro~\ref{tab:resultados} resume o que cada demonstração comprovou.
+
+\begin{table}[H]
+\caption{Resultados obtidos nas demonstrações}
+\label{tab:resultados}
+\begin{spacing}{1.0}\footnotesize\renewcommand{\arraystretch}{1.3}
+\noindent\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}\hline
+\textbf{Banco} & \textbf{Resultado} \\\hline
+PostgreSQL & O pedido 1 foi registrado com dois itens (2 celulares e 1 livro), valor total de R\$ 3.080,00 e pagamento aprovado; o estoque do celular passou de 10 para 8 e o do livro de 20 para 19. No teste com 100 celulares, a transação levantou ``Estoque insuficiente'' e nada foi gravado: o banco continuou com 1 pedido, 2 itens, 1 pagamento e 8 celulares em estoque. \\\hline
+MongoDB & Os três produtos foram gravados na mesma coleção com atributos diferentes, e as consultas filtraram por categoria, por marca e por atributo interno (celulares com 8 GB de RAM). \\\hline
+Redis & A sessão foi criada com TTL de 1800 s. O carrinho refletiu a inclusão de dois produtos, o incremento de um e a remoção do outro. O ranking ordenou PROD001 (2 visualizações) à frente de PROD002 (1). A marca MAR001 retornou o produto CEL001, com seus dados lidos do \textit{hash}, sem consultar o MongoDB. \\\hline
+Cassandra & O histórico do USR001 retornou seus dois eventos do mais recente para o mais antigo. \\\hline
+Neo4j & Resultados no Quadro~\ref{tab:neo4j}. \\\hline
+\end{tabularx}
+\end{spacing}
+\end{table}
+\fonte{Elaborado pelos autores (2026)}
+
+\begin{table}[H]
+\caption{Resultados das recomendações no Neo4j}
+\label{tab:neo4j}
+\begin{spacing}{1.0}\footnotesize\renewcommand{\arraystretch}{1.3}
+\noindent\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{6cm}|>{\raggedright\arraybackslash}X|}\hline
+\textbf{Consulta} & \textbf{Resultado} \\\hline
+Quem comprou o Smartphone Galaxy (CEL001) também comprou & Capa Protetora (3 clientes), Carregador Turbo (2), Fone Bluetooth (2), Engenharia de Software (1) \\\hline
+Clientes parecidos com João (USR001) & Pedro (3 produtos em comum), Ana (2), Maria (2), Bruno (1) \\\hline
+Clientes parecidos com João compraram isto & Carregador Turbo (pontuação 5) e Smartphone Moto G (pontuação 2) \\\hline
+\end{tabularx}
+\end{spacing}
+\end{table}
+\fonte{Elaborado pelos autores (2026)}
+
+O cliente USR009, com apenas um produto em comum com USR001, ficou abaixo do limite de semelhança, e por isso o livro que ele comprou não foi recomendado.
+
+\section{CONSIDERAÇÕES FINAIS}
+
+O trabalho mostrou, na prática, que cada um dos cinco bancos resolve melhor um tipo de problema. O PostgreSQL garantiu a atomicidade do pedido. O MongoDB acomodou um catálogo heterogêneo sem esquema rígido. O Redis atendeu aos dados efêmeros e de alta frequência com estruturas em memória e expiração nativa, e também serviu de índice rápido por marca alimentado pelo catálogo. A Cassandra organizou os eventos de navegação para escrita massiva e leitura por usuário. O Neo4j respondeu às recomendações seguindo relacionamentos. A escolha de cada tecnologia partiu do padrão de acesso do requisito, conforme o princípio da persistência poliglota.
+
+A integração entre MongoDB e Redis no R8 evidenciou o principal custo da abordagem: manter os bancos sincronizados. Neste trabalho a sincronização foi feita por script; em produção, exigiria mecanismos como eventos de domínio, filas ou captura de mudanças, com atenção à consistência eventual entre os bancos.
+
+Como trabalhos futuros, destacam-se: padronizar os identificadores de produto entre todos os bancos (o carrinho, o ranking e o histórico usam identificadores genéricos, como PROD001); ampliar o volume de dados de carga; acrescentar à chave de agrupamento da Cassandra um identificador \texttt{timeuuid}, para que dois eventos no mesmo milissegundo não se sobrescrevam; e executar a Cassandra em \textit{cluster} com mais de um nó para explorar os níveis de consistência.
+
+% ============================================================
+%  REFERÊNCIAS
+% ============================================================
+\newpage
+\phantomsection
+\addcontentsline{toc}{section}{REFERÊNCIAS}
+\begin{center}{\bfseries\MakeUppercase{Referências}}\end{center}
+\vspace{4pt}
+
+\begingroup
+\setlength{\parindent}{0pt}
+\raggedright
+\begin{spacing}{1.0}
+\renewcommand{\refname}{}
+\makeatletter
+\let\oldbibitem\bibitem
+\renewcommand{\bibitem}[1]{\oldbibitem{#1}\vspace{8pt}}
+\makeatother
+
+\begin{thebibliography}{99}
+\vspace{-10pt}
+
+\bibitem{cassandradoc}
+APACHE SOFTWARE FOUNDATION. \textit{Apache Cassandra Documentation}. [\textit{S. l.}], 2026. Disponível em: \url{https://cassandra.apache.org/doc/latest/}. Acesso em: 23 nov. 2026.
+
+\bibitem{bradshaw2019}
+BRADSHAW, S.; BRAZIL, E.; CHODOROW, K. \textit{MongoDB}: the definitive guide. 3. ed. Sebastopol: O'Reilly Media, 2019.
+
+\bibitem{brewer2000}
+BREWER, E. A. Towards robust distributed systems. In: ANNUAL ACM SYMPOSIUM ON PRINCIPLES OF DISTRIBUTED COMPUTING, 19., 2000, Portland. \textit{Proceedings} [\ldots]. New York: ACM, 2000. p. 7.
+
+\bibitem{carlson2013}
+CARLSON, J. L. \textit{Redis in Action}. Shelter Island: Manning, 2013.
+
+\bibitem{carpenter2020}
+CARPENTER, J.; HEWITT, E. \textit{Cassandra}: the definitive guide. 3. ed. Sebastopol: O'Reilly Media, 2020.
+
+\bibitem{dockerdoc}
+DOCKER. \textit{Docker Compose Documentation}. [\textit{S. l.}], 2026. Disponível em: \url{https://docs.docker.com/compose/}. Acesso em: 23 nov. 2026.
+
+\bibitem{elmasri2018}
+ELMASRI, R.; NAVATHE, S. B. \textit{Sistemas de banco de dados}. 7. ed. São Paulo: Pearson, 2018.
+
+\bibitem{kleppmann2017}
+KLEPPMANN, M. \textit{Designing Data-Intensive Applications}: the big ideas behind reliable, scalable, and maintainable systems. Sebastopol: O'Reilly Media, 2017.
+
+\bibitem{mongodoc}
+MONGODB. \textit{MongoDB Manual}. [\textit{S. l.}], 2026. Disponível em: \url{https://www.mongodb.com/docs/manual/}. Acesso em: 23 nov. 2026.
+
+\bibitem{neo4jdoc}
+NEO4J. \textit{Neo4j Cypher Manual}. [\textit{S. l.}], 2026. Disponível em: \url{https://neo4j.com/docs/cypher-manual/current/}. Acesso em: 23 nov. 2026.
+
+\bibitem{postgresdoc}
+POSTGRESQL GLOBAL DEVELOPMENT GROUP. \textit{PostgreSQL 16 Documentation}. [\textit{S. l.}], 2026. Disponível em: \url{https://www.postgresql.org/docs/16/}. Acesso em: 23 nov. 2026.
+
+\bibitem{redisdoc}
+REDIS. \textit{Redis Documentation}. [\textit{S. l.}], 2026. Disponível em: \url{https://redis.io/docs/}. Acesso em: 23 nov. 2026.
+
+\bibitem{robinson2015}
+ROBINSON, I.; WEBBER, J.; EIFREM, E. \textit{Graph Databases}: new opportunities for connected data. 2. ed. Sebastopol: O'Reilly Media, 2015.
+
+\bibitem{sadalage2013}
+SADALAGE, P. J.; FOWLER, M. \textit{NoSQL Essencial}: um guia conciso para o mundo emergente da persistência poliglota. São Paulo: Novatec, 2013.
+
+\end{thebibliography}
+\end{spacing}
+\endgroup
+
+% ============================================================
+%  APÊNDICE A — INSTRUÇÕES DE EXECUÇÃO
+% ============================================================
+\newpage
+\phantomsection
+\addcontentsline{toc}{section}{APÊNDICE A -- INSTRUÇÕES DE EXECUÇÃO}
+\begin{center}{\bfseries\MakeUppercase{Apêndice A -- Instruções de execução}}\end{center}
+\vspace{\baselineskip}
+
+Com o Docker Desktop em execução, na raiz do repositório. No Windows, os comandos com redirecionamento (\texttt{<}) devem ser executados no Git Bash ou no CMD.
+
+\begin{spacing}{1.0}
+\begin{lstlisting}
+# Sobe os cinco bancos
+docker compose --profile outros up -d
+
+# PostgreSQL (R1)
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U admin -d marketplace < pessoa1/postgresql/01_tabelas.sql
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U admin -d marketplace < pessoa1/postgresql/02_dados.sql
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U admin -d marketplace < pessoa1/postgresql/03_pedidos.sql
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U admin -d marketplace < pessoa1/postgresql/04_testes.sql
+
+# MongoDB (R2)
+docker compose exec -T mongodb mongosh --quiet marketplace < pessoa1/mongodb/01_catalogo.js
+docker compose exec -T mongodb mongosh --quiet marketplace < pessoa1/mongodb/02_consultas.js
+
+# Cassandra (R6)
+docker compose exec -T cassandra cqlsh < pessoa2/cassandra/01_historico.cql
+
+# Neo4j (R7)
+docker compose exec -T neo4j cypher-shell -u neo4j -p marketplace123 < pessoa3/neo4j/01_criacao_carga.cypher
+docker compose exec -T neo4j cypher-shell -u neo4j -p marketplace123 < pessoa3/neo4j/02_recomendacoes.cypher
+\end{lstlisting}
+\end{spacing}
+
+Os comandos do Redis (R3, R4, R5 e R8) estão no \texttt{README.md} da raiz e em \texttt{pessoa2/README.md}. Para visualizar o grafo do Neo4j, acesse \url{http://localhost:7474}, com usuário \texttt{neo4j} e senha \texttt{marketplace123}.
+
+Vídeo da apresentação: \Video.
+
+\end{document}
