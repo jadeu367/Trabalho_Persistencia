@@ -7,13 +7,12 @@
 \documentclass[12pt,a4paper,oneside]{article}
 
 % ------- Dados do trabalho  >>> CONFERIR OS CAMPOS ENTRE COLCHETES <<< -------
-\newcommand{\PessoaUm}{Laura Ramos}
+\newcommand{\PessoaUm}{Laura Ramos dos Santos}
 \newcommand{\PessoaDois}{Matheus Araújo Silva}
 \newcommand{\PessoaTres}{Marques Vinícius Melo Martins}
-\newcommand{\Professor}{[NOME DO PROFESSOR]}
+\newcommand{\Professor}{Pedro Henrique Mendes}
 \newcommand{\Titulo}{Marketplace: camada de persistência poliglota com PostgreSQL, MongoDB, Redis, Cassandra e Neo4j}
 \newcommand{\Repositorio}{https://github.com/jadeu367/Trabalho_Persistencia}
-\newcommand{\Video}{[LINK DO VÍDEO]}
 
 % ------- Pacotes -------
 \usepackage[T1]{fontenc}
@@ -151,8 +150,6 @@
 
 \@namedef{cite@sadalage2013}{Sadalage; Fowler, 2013}
 \@namedef{citet@sadalage2013}{Sadalage e Fowler (2013)}
-\@namedef{cite@kleppmann2017}{Kleppmann, 2017}
-\@namedef{citet@kleppmann2017}{Kleppmann (2017)}
 \@namedef{cite@elmasri2018}{Elmasri; Navathe, 2018}
 \@namedef{citet@elmasri2018}{Elmasri e Navathe (2018)}
 \@namedef{cite@robinson2015}{Robinson; Webber; Eifrem, 2015}
@@ -161,22 +158,6 @@
 \@namedef{citet@carpenter2020}{Carpenter e Hewitt (2020)}
 \@namedef{cite@carlson2013}{Carlson, 2013}
 \@namedef{citet@carlson2013}{Carlson (2013)}
-\@namedef{cite@bradshaw2019}{Bradshaw; Brazil; Chodorow, 2019}
-\@namedef{citet@bradshaw2019}{Bradshaw, Brazil e Chodorow (2019)}
-\@namedef{cite@brewer2000}{Brewer, 2000}
-\@namedef{citet@brewer2000}{Brewer (2000)}
-\@namedef{cite@postgresdoc}{PostgreSQL Global Development Group, 2026}
-\@namedef{citet@postgresdoc}{PostgreSQL Global Development Group (2026)}
-\@namedef{cite@mongodoc}{MongoDB, 2026}
-\@namedef{citet@mongodoc}{MongoDB (2026)}
-\@namedef{cite@redisdoc}{Redis, 2026}
-\@namedef{citet@redisdoc}{Redis (2026)}
-\@namedef{cite@cassandradoc}{Apache Software Foundation, 2026}
-\@namedef{citet@cassandradoc}{Apache Software Foundation (2026)}
-\@namedef{cite@neo4jdoc}{Neo4j, 2026}
-\@namedef{citet@neo4jdoc}{Neo4j (2026)}
-\@namedef{cite@dockerdoc}{Docker, 2026}
-\@namedef{citet@dockerdoc}{Docker (2026)}
 
 \newcommand{\tys@getpar}[1]{%
   \@ifundefined{cite@#1}{\textbf{??#1??}}{\@nameuse{cite@#1}}%
@@ -351,16 +332,16 @@ Este documento está organizado em seis capítulos. O Capítulo 2 resume os conc
 
 \subsection{Bancos relacionais e transações ACID}
 
-O modelo relacional organiza os dados em tabelas com esquema definido e relacionamentos expressos por chaves estrangeiras \cite{elmasri2018}. Seu principal diferencial para o problema estudado é o suporte a transações com as propriedades ACID. A atomicidade garante que um conjunto de operações seja aplicado por inteiro ou não seja aplicado. A consistência preserva as restrições declaradas. O isolamento impede que transações concorrentes vejam estados intermediários umas das outras, e a durabilidade mantém o que foi confirmado mesmo após falhas \cite{kleppmann2017}.
+O modelo relacional organiza os dados em tabelas com esquema definido e relacionamentos expressos por chaves estrangeiras \cite{elmasri2018}. Seu principal diferencial para o problema estudado é o suporte a transações com as propriedades ACID. A atomicidade garante que um conjunto de operações seja aplicado por inteiro ou não seja aplicado. A consistência preserva as restrições declaradas. O isolamento impede que transações concorrentes vejam estados intermediários umas das outras, e a durabilidade mantém o que foi confirmado mesmo após falhas \cite{elmasri2018}.
 
 \subsection{Bancos NoSQL e o compromisso entre consistência e disponibilidade}
 
-O termo NoSQL agrupa bancos que abrem mão de parte das garantias ou da generalidade do modelo relacional em troca de escalabilidade horizontal, flexibilidade de esquema ou desempenho em padrões de acesso específicos \cite{sadalage2013}. Em sistemas distribuídos, o teorema CAP afirma que, diante de uma partição de rede, um sistema precisa escolher entre consistência e disponibilidade \cite{brewer2000}. Bancos como a Cassandra priorizam disponibilidade e tolerância a partições, com consistência ajustável por operação \cite{carpenter2020}.
+O termo NoSQL agrupa bancos que abrem mão de parte das garantias ou da generalidade do modelo relacional em troca de escalabilidade horizontal, flexibilidade de esquema ou desempenho em padrões de acesso específicos \cite{sadalage2013}. Em sistemas distribuídos, o teorema CAP afirma que, diante de uma partição de rede, um sistema precisa escolher entre consistência e disponibilidade \cite{sadalage2013}. Bancos como a Cassandra priorizam disponibilidade e tolerância a partições, com consistência ajustável por operação \cite{carpenter2020}.
 
 Os quatro modelos NoSQL usados neste trabalho são:
 
 \begin{itemize}
-\item \textbf{Documentos (MongoDB):} registros autocontidos em formato semelhante a JSON, sem exigência de que documentos da mesma coleção tenham os mesmos campos \cite{bradshaw2019}.
+\item \textbf{Documentos (MongoDB):} registros autocontidos em formato semelhante a JSON, sem exigência de que documentos da mesma coleção tenham os mesmos campos \cite{sadalage2013}.
 \item \textbf{Chave-valor em memória (Redis):} estruturas de dados (\textit{strings}, \textit{hashes}, conjuntos e conjuntos ordenados) mantidas em memória, com operações atômicas e expiração nativa de chaves \cite{carlson2013}.
 \item \textbf{Famílias de colunas (Cassandra):} tabelas particionadas por uma chave de partição e ordenadas por chaves de agrupamento (\textit{clustering keys}), otimizadas para escrita distribuída \cite{carpenter2020}.
 \item \textbf{Grafos (Neo4j):} nós e relacionamentos como elementos de primeira classe, com propriedades em ambos e consultas expressas como padrões de caminho \cite{robinson2015}.
@@ -395,15 +376,15 @@ R8 & Listar produtos de uma marca sem consultar o banco principal & Redis & \tex
 
 \subsection{R1 -- Registro de pedido com baixa de estoque}
 
-O requisito exige que pedido, itens, pagamento e baixa de estoque aconteçam por inteiro ou não aconteçam. Trata-se de uma transação que envolve várias entidades relacionadas, cada uma com restrições de integridade: o estoque não pode ficar negativo e todo item precisa estar vinculado a um pedido e a um produto existentes. O PostgreSQL oferece transações ACID, chaves estrangeiras e restrições \texttt{CHECK} \cite{postgresdoc}, o que o torna a escolha natural. O MongoDB também suporta transações com vários documentos, mas com custo e restrições maiores, e o problema é intrinsecamente relacional. As demais tecnologias não oferecem atomicidade entre várias entidades.
+O requisito exige que pedido, itens, pagamento e baixa de estoque aconteçam por inteiro ou não aconteçam. Trata-se de uma transação que envolve várias entidades relacionadas, cada uma com restrições de integridade: o estoque não pode ficar negativo e todo item precisa estar vinculado a um pedido e a um produto existentes. O PostgreSQL oferece transações ACID, chaves estrangeiras e restrições \texttt{CHECK} \cite{elmasri2018}, o que o torna a escolha natural. O MongoDB também suporta transações com vários documentos, mas com custo e restrições maiores, e o problema é intrinsecamente relacional. As demais tecnologias não oferecem atomicidade entre várias entidades.
 
 \subsection{R2 -- Catálogo com atributos por categoria}
 
-Celular tem memória e tela, livro tem ISBN e número de páginas, camiseta tem tamanho e cor. No modelo relacional isso levaria a uma tabela com dezenas de colunas quase sempre nulas, a uma tabela por categoria ou ao padrão entidade-atributo-valor, que dificulta consultas e validação. No MongoDB, cada produto é um documento com os campos comuns (nome, preço, categoria e marca) e um subdocumento \texttt{atributos} próprio da categoria \cite{bradshaw2019}. Novas categorias não exigem alteração de esquema, e ainda assim é possível indexar e filtrar por atributos internos.
+Celular tem memória e tela, livro tem ISBN e número de páginas, camiseta tem tamanho e cor. No modelo relacional isso levaria a uma tabela com dezenas de colunas quase sempre nulas, a uma tabela por categoria ou ao padrão entidade-atributo-valor, que dificulta consultas e validação. No MongoDB, cada produto é um documento com os campos comuns (nome, preço, categoria e marca) e um subdocumento \texttt{atributos} próprio da categoria \cite{sadalage2013}. Novas categorias não exigem alteração de esquema, e ainda assim é possível indexar e filtrar por atributos internos.
 
 \subsection{R3 -- Sessão com expiração automática}
 
-A sessão é um dado efêmero, lido a cada requisição, que deve desaparecer após 30 minutos sem atividade e sem rotina de limpeza. O Redis associa um tempo de vida (TTL) a qualquer chave e a remove sozinho quando o prazo vence \cite{redisdoc}. A sessão é gravada com \texttt{SET ... EX 1800}, ou seja, com validade de 1800 segundos. Para que a contagem parta da inatividade, a aplicação renova esse prazo a cada requisição do usuário (por exemplo, com \texttt{EXPIRE}), e a chave só expira depois de 30 minutos sem acesso. A leitura em memória também atende à frequência de acesso.
+A sessão é um dado efêmero, lido a cada requisição, que deve desaparecer após 30 minutos sem atividade e sem rotina de limpeza. O Redis associa um tempo de vida (TTL) a qualquer chave e a remove sozinho quando o prazo vence \cite{carlson2013}. A sessão é gravada com \texttt{SET ... EX 1800}, ou seja, com validade de 1800 segundos. Para que a contagem parta da inatividade, a aplicação renova esse prazo a cada requisição do usuário (por exemplo, com \texttt{EXPIRE}), e a chave só expira depois de 30 minutos sem acesso. A leitura em memória também atende à frequência de acesso.
 
 \subsection{R4 -- Carrinho de compras}
 
@@ -411,7 +392,7 @@ O carrinho muda a cada clique e é consultado com frequência. Um \textit{hash} 
 
 \subsection{R5 -- Visualizações e ranking dos mais vistos}
 
-Cada visualização incrementa o contador do produto com \texttt{INCR}, uma operação atômica que não perde incrementos sob concorrência. O ranking usa um \textit{sorted set}, que mantém os membros ordenados pelo \textit{score}: com o produto como membro e as visualizações como \textit{score}, o \texttt{ZINCRBY} reposiciona o produto a cada nova visualização, e o \texttt{ZREVRANGE} devolve os mais vistos já ordenados, em tempo logarítmico \cite{redisdoc}.
+Cada visualização incrementa o contador do produto com \texttt{INCR}, uma operação atômica que não perde incrementos sob concorrência. O ranking usa um \textit{sorted set}, que mantém os membros ordenados pelo \textit{score}: com o produto como membro e as visualizações como \textit{score}, o \texttt{ZINCRBY} reposiciona o produto a cada nova visualização, e o \texttt{ZREVRANGE} devolve os mais vistos já ordenados, em tempo logarítmico \cite{carlson2013}.
 
 \subsection{R6 -- Eventos de navegação em alto volume}
 
@@ -615,7 +596,7 @@ ORDER BY pontuacao DESC LIMIT 5;
 
 \subsection{Docker Compose}
 
-O arquivo \texttt{docker-compose.yml} define os cinco serviços, com as imagens oficiais \texttt{postgres:16}, \texttt{mongo:7}, \texttt{redis:7}, \texttt{cassandra:5.0} e \texttt{neo4j:5}, cada um com volume próprio de dados \cite{dockerdoc}. PostgreSQL, MongoDB e Redis sobem com \texttt{docker compose up -d}. Cassandra e Neo4j, mais pesados, ficam no perfil \texttt{outros}, de modo que o comando \texttt{docker compose --profile outros up -d} sobe os cinco bancos de uma vez.
+O arquivo \texttt{docker-compose.yml} define os cinco serviços, com as imagens oficiais \texttt{postgres:16}, \texttt{mongo:7}, \texttt{redis:7}, \texttt{cassandra:5.0} e \texttt{neo4j:5}, cada um com volume próprio de dados. PostgreSQL, MongoDB e Redis sobem com \texttt{docker compose up -d}. Cassandra e Neo4j, mais pesados, ficam no perfil \texttt{outros}, de modo que o comando \texttt{docker compose --profile outros up -d} sobe os cinco bancos de uma vez.
 
 Os scripts são executados pelo cliente nativo de cada banco (\texttt{psql}, \texttt{mongosh}, \texttt{redis-cli}, \texttt{cqlsh} e \texttt{cypher-shell}) com \texttt{docker compose exec}, recebendo o arquivo pelo redirecionamento de entrada (\texttt{<}). Os comandos de cada banco estão no \texttt{README.md} da raiz e nos arquivos \texttt{README.md} das pastas dos integrantes.
 
@@ -689,41 +670,14 @@ Como trabalhos futuros, destacam-se: padronizar os identificadores de produto en
 \begin{thebibliography}{99}
 \vspace{-10pt}
 
-\bibitem{cassandradoc}
-APACHE SOFTWARE FOUNDATION. \textit{Apache Cassandra Documentation}. [\textit{S. l.}], 2026. Disponível em: \url{https://cassandra.apache.org/doc/latest/}. Acesso em: 23 nov. 2026.
-
-\bibitem{bradshaw2019}
-BRADSHAW, S.; BRAZIL, E.; CHODOROW, K. \textit{MongoDB}: the definitive guide. 3. ed. Sebastopol: O'Reilly Media, 2019.
-
-\bibitem{brewer2000}
-BREWER, E. A. Towards robust distributed systems. In: ANNUAL ACM SYMPOSIUM ON PRINCIPLES OF DISTRIBUTED COMPUTING, 19., 2000, Portland. \textit{Proceedings} [\ldots]. New York: ACM, 2000. p. 7.
-
 \bibitem{carlson2013}
 CARLSON, J. L. \textit{Redis in Action}. Shelter Island: Manning, 2013.
 
 \bibitem{carpenter2020}
 CARPENTER, J.; HEWITT, E. \textit{Cassandra}: the definitive guide. 3. ed. Sebastopol: O'Reilly Media, 2020.
 
-\bibitem{dockerdoc}
-DOCKER. \textit{Docker Compose Documentation}. [\textit{S. l.}], 2026. Disponível em: \url{https://docs.docker.com/compose/}. Acesso em: 23 nov. 2026.
-
 \bibitem{elmasri2018}
 ELMASRI, R.; NAVATHE, S. B. \textit{Sistemas de banco de dados}. 7. ed. São Paulo: Pearson, 2018.
-
-\bibitem{kleppmann2017}
-KLEPPMANN, M. \textit{Designing Data-Intensive Applications}: the big ideas behind reliable, scalable, and maintainable systems. Sebastopol: O'Reilly Media, 2017.
-
-\bibitem{mongodoc}
-MONGODB. \textit{MongoDB Manual}. [\textit{S. l.}], 2026. Disponível em: \url{https://www.mongodb.com/docs/manual/}. Acesso em: 23 nov. 2026.
-
-\bibitem{neo4jdoc}
-NEO4J. \textit{Neo4j Cypher Manual}. [\textit{S. l.}], 2026. Disponível em: \url{https://neo4j.com/docs/cypher-manual/current/}. Acesso em: 23 nov. 2026.
-
-\bibitem{postgresdoc}
-POSTGRESQL GLOBAL DEVELOPMENT GROUP. \textit{PostgreSQL 16 Documentation}. [\textit{S. l.}], 2026. Disponível em: \url{https://www.postgresql.org/docs/16/}. Acesso em: 23 nov. 2026.
-
-\bibitem{redisdoc}
-REDIS. \textit{Redis Documentation}. [\textit{S. l.}], 2026. Disponível em: \url{https://redis.io/docs/}. Acesso em: 23 nov. 2026.
 
 \bibitem{robinson2015}
 ROBINSON, I.; WEBBER, J.; EIFREM, E. \textit{Graph Databases}: new opportunities for connected data. 2. ed. Sebastopol: O'Reilly Media, 2015.
@@ -771,7 +725,5 @@ docker compose exec -T neo4j cypher-shell -u neo4j -p marketplace123 < pessoa3/n
 \end{spacing}
 
 Os comandos do Redis (R3, R4, R5 e R8) estão no \texttt{README.md} da raiz e em \texttt{pessoa2/README.md}. Para visualizar o grafo do Neo4j, acesse \url{http://localhost:7474}, com usuário \texttt{neo4j} e senha \texttt{marketplace123}.
-
-Vídeo da apresentação: \Video.
 
 \end{document}
